@@ -10,6 +10,9 @@ public class Piece {
     public String getUrl() {
         return this.pieceType.url;
     }
+    public PieceType getPieceType() {
+        return this.pieceType;
+    }
 
     public enum PieceType {
         TIC("art/krestik.gif") {

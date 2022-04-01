@@ -46,7 +46,7 @@ public class MainWindow {
 
         public void drawField() {
             for(int i = 0; i < 9; i++) {
-                TilePanel tilePanel = new TilePanel(this,i);
+                TilePanel tilePanel = new TilePanel(this.gameBoard,i);
                 add(tilePanel);
             }
         }
@@ -65,14 +65,18 @@ public class MainWindow {
     }
 
     public static class TilePanel extends JPanel {
-        private int tileId;
-        private Map<Integer, Piece> contMap;
-        TilePanel(FieldOfTiles fieldOfTiles, int tileId) {
+        private final int tileId;
+        private final Map<Integer, Piece> contMap;
+        private Piece.PieceType moveMaker = Piece.PieceType.TIC;
+
+
+        TilePanel(Map<Integer,Piece> contMap, int tileId) {
             super(new GridBagLayout());
-            contMap = fieldOfTiles.gameBoard;
+            this.contMap = contMap;
             this.tileId = tileId;
             this.setPreferredSize(DIMENSION_OF_TILE);
             listener();
+            System.out.println(contMap);
         }
 
         public void listener() {
@@ -80,17 +84,20 @@ public class MainWindow {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if(isLeftMouseButton(e)) {
-                        System.out.println(tileId);
-                        Piece piece = new Piece(Piece.PieceType.TIC);
-                        try {
-                            BufferedImage image = ImageIO.read(new File(piece.getUrl()));
-                            ImageIcon imageIcon = new ImageIcon(image);
-                            add(new JLabel(imageIcon));
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
+                        if(contMap.get(tileId) == null) {
+                            System.out.println(tileId);
+                            Piece piece = new Piece(moveMaker);
+                            try {
+                                BufferedImage image = ImageIO.read(new File(piece.getUrl()));
+                                ImageIcon imageIcon = new ImageIcon(image);
+                                add(new JLabel(imageIcon));
+                                contMap.replace(tileId, piece);
+                                setMoveMaker(piece.getPieceType());
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                            validate();
                         }
-                        validate();
-
                     }
                 }
 
@@ -114,6 +121,10 @@ public class MainWindow {
 
                 }
             });
+        }
+
+        public Piece.PieceType setMoveMaker(Piece.PieceType moveMaker) {
+            return moveMaker == Piece.PieceType.TIC ? Piece.PieceType.TACTOE : Piece.PieceType.TIC;
         }
     }
 }
